@@ -35,14 +35,15 @@ describe("createTarget", () => {
     const duration = 12;
 
     // Ensure the user has some tokens to cover the fee
-    await token.connect(owner).transfer(user.address, 100);
+    //await testToken.connect(owner).transfer(user.address, 100);
 
     // Approve the contract to spend tokens on behalf of the user
-    await token.connect(user).approve(vunaVault.address, 1);
+    console.log(await testToken.balanceOf(owner.address))
+    await testToken.connect(user).increaseAllowance(vunaVault.getAddress(), ethers.parseEther('10'));
 
     // Create the target
     await expect(
-      vunaVault.connect(user).createTarget(targetAmount, contributionPerTurn, duration)
+      vunaVault.connect(owner).createTarget(targetAmount, contributionPerTurn, duration)
     ).to.emit(vunaVault, "TargetSavingsCreated");
 
     // Additional assertions can be added based on the contract's logic

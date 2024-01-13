@@ -23,7 +23,7 @@ contract VunaVault  is Ownable{
     error InsufficientFunds();
     error PoolNotActive();
 
-    event TargetSavingsCreated(address user,  uint256 target, uint256 contribution, uint256 duration);
+    event TargetSavingsCreated(address user,  uint256 target, uint256 contribution);
 
 
     IERC20 token;
@@ -33,7 +33,6 @@ contract VunaVault  is Ownable{
     struct SavingGoals {
         uint256 targetSavings;
         uint256 contributionPerTurn;
-        uint256 durationPerTurn;
         uint256 totalcontributed;
         bool isActive;
         bool isTargetReached;
@@ -56,13 +55,13 @@ contract VunaVault  is Ownable{
     }
 
     // User creates the target
-    function createTarget( uint256 _target, uint256 _contributionPerTurn, uint256 _duration) external {
+    function createTarget( uint256 _target, uint256 _contributionPerTurn) external {
         uint256 count = countPools(msg.sender);
         userGoalCount[msg.sender] = ++count;
 
 
         //inputValidation
-        if(_target == 0 || _contributionPerTurn>_target || _duration==0) revert InvalidInput();
+        if(_target == 0 || _contributionPerTurn>_target ) revert InvalidInput();
         //Ensure the user has enough to cover the fee
         if(token.balanceOf(msg.sender) < fee) revert NotEnoughForFees();
 
@@ -77,7 +76,6 @@ contract VunaVault  is Ownable{
         SavingGoals storage setDetails = userPool[msg.sender][count];
         setDetails.targetSavings = _target;
         setDetails.contributionPerTurn = _contributionPerTurn;
-        setDetails.durationPerTurn = _duration;
         setDetails.isActive = true;
 
         emit TargetSavingsCreated(msg.sender, _target, _contributionPerTurn, _duration);
